@@ -3,8 +3,7 @@
 set -ex
 
 pkgs=$(rg -l "autoreconf" | xargs dirname  -- )
-
-while IFS= read -r line; do
+while IFS= read -r line <&3; do
 	if grep -q "$line" ignore-list; then
 		echo "Ignoring $line"
 		continue
@@ -17,4 +16,4 @@ while IFS= read -r line; do
 		echo "$line can't be built without patch."
 	fi
 	read -p "Press <ENTER> to continue..."
-done < <(echo "$pkgs" | sed "/\./d")
+done 3< <(echo "$pkgs" | sed "/\./d")
