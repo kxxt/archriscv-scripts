@@ -12,9 +12,9 @@ while IFS= read -r line; do
 	
 	if (cd ../packages && bash ./build-vanilla.bash "$line") && rm -r "$line"; 
 	then
-		echo "$line can be built from patch."
+		echo "$line can be built without patch."
 	else
-		echo "$line can't be built from patch."
+		echo "$line can't be built without patch."
 	fi
-	read -r
+	read -p "Press <ENTER> to continue..."
 done < <(echo "$pkgs" | sed "/\./d")
