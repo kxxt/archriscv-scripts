@@ -34,4 +34,4 @@ git add "$1"
 git commit -m "rmvpatch: $1"
 git push
 pull_request
-
+git co master
