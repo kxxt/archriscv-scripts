@@ -3,10 +3,9 @@
 set -ex
 
 pkgs=$(rg -l "autoreconf" | xargs dirname  -- )
-ignore_list=$(<ignore-list)
 
 while IFS= read -r line; do
-	if grep -q "$line" <<< "$ignore_list"; then
+	if grep -q "$line" ignore-list; then
 		echo "Ignoring $line"
 		continue
 	fi
