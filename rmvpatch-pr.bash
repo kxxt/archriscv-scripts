@@ -31,7 +31,7 @@ fi
 git switch -c "$1" || git checkout "$1"
 rm -rf "$1"
 git add "$1"
-git commit -m "rmvpatch: $1"
+git commit -m "rmvpatch: $1\n\nThis package can be built without patch.\nAutomated by https://github.com/kxxt/archriscv-scripts"
 git push
 pull_request
 git co master
