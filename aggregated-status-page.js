@@ -76,6 +76,11 @@ GM_xmlhttpRequest({
       let { archUrl, marks, user, status } = map.get(pkgname);
       let a = document.createElement("a");
       a.href = archUrl;
+      a.innerText = tr.children[0].innerText;
+      tr.children[0].innerHTML = "";
+      tr.children[0].append(a);
+      a = document.createElement("a");
+      a.href = `https://archriscv.felixc.at/.status/logs/${pkgname}/`
       a.innerText = pkg;
       tr.children[1].innerHTML = "";
       tr.children[1].append(a);
