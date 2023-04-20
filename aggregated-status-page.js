@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         Aggregated status page
 // @namespace    http://kxxt.dev
-// @version      0.3
+// @version      0.4
 // @description  Aggregated status page
 // @author       kxxt
 // @match        https://archriscv.felixc.at/.status/status.htm
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=tampermonkey.net
+// @require      https://cdn.jsdelivr.net/npm/autolink-js@1.0.2/autolink.min.js
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
@@ -85,11 +86,13 @@ GM_xmlhttpRequest({
         tr.classList.add(`pkgmark-${mark}`);
         let details = document.createElement("details");
         let summary = document.createElement("summary");
+        let span = document.createElement("span");
         summary.innerText = mark;
-        content = content.split(/\.\.\.(.*)/s).join("").trim();
+        content = content.split(/\.\.\.(.*)/s).join("").trim().autoLink({ target: "_blank" });
         details.classList.add(`pkgmark`, `pkgmark-${mark}`);
+        span.innerHTML = content; // XSS? I don't care that!?
         details.append(summary);
-        details.append(content);
+        details.append(span);
         marksEle.append(details);
       }
       tr.append(marksEle);
