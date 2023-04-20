@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Aggregated status page
 // @namespace    http://kxxt.dev
-// @version      0.2
+// @version      0.3
 // @description  Aggregated status page
 // @author       kxxt
 // @match        https://archriscv.felixc.at/.status/status.htm
@@ -21,13 +21,15 @@ tr.pkgmark-outdated,tr.pkgmark-outdated_dep,tr.pkgmark-missing_dep,tr.pkgmark-ig
 tr.pkgmark-unknown{background-color:khaki;}
 tr.pkgmark-nocheck{background-color:lightgoldenrodyellow;}
 tr.pkgmark-flaky{background-color:lightsteelblue;}
-div.pkgmark-noqemu{background-color:hotpink;}
-div.pkgmark-upstreamed{background-color:lightseagreen;}
-div.pkgmark-unknown{background-color:gold;}
-div.pkgmark-outdated_dep, div.pkgmark-outdated{background-color: yellow;}
-div.pkgmark-stuck{background-color: lightsalmon;}
-div.pkgmark-ready{background-color: aqua;}
-div.pkgmark-ignore{background-color: azure;}
+details.pkgmark-noqemu{background-color:hotpink;}
+details.pkgmark-upstreamed{background-color:lightseagreen;}
+details.pkgmark-unknown{background-color:gold;}
+details.pkgmark-outdated_dep, div.pkgmark-outdated{background-color: yellow;}
+details.pkgmark-stuck{background-color: lightsalmon;}
+details.pkgmark-ready{background-color: aqua;}
+details.pkgmark-ignore{background-color: azure;}
+details.pkgmark-nocheck{background-color: lightcoral;}
+details { white-space: pre-wrap; }
 `;
 
 document.head.append(style);
@@ -41,7 +43,6 @@ GM_xmlhttpRequest({
     let trs = dom.body.querySelectorAll("table > tbody > tr");
     let map = new Map();
     for (let tr of trs.values()) {
-      // let status = Array.from(tr.classList).map(x => x.split('-')[1])
       let archUrl = tr.querySelector("td > a:first-child");
       let marks = new Map();
       tr.querySelectorAll("td > span.pkgmark").forEach((x) =>
@@ -50,8 +51,8 @@ GM_xmlhttpRequest({
       let pkgname =
         tr.querySelector("td > a:nth-child(2)")?.innerText ??
         tr.children[0].childNodes[1].data.slice(2).trim();
-      let user = tr.children[1] ?? document.createElement("td");
-      let status = tr.children[2] ?? document.createElement("td");
+      let user = tr.children[1];
+      let status = tr.children[2];
       map.set(pkgname, { archUrl, marks, user, status });
     }
     let thead = document.querySelector("table.table > thead > tr");
@@ -63,7 +64,6 @@ GM_xmlhttpRequest({
       })
     );
     trs = document.querySelectorAll("table.table > tbody > tr");
-    console.log(map);
     for (let tr of trs) {
       let pkg = tr.children[1].innerText;
       let pat = /.+ \((.+)\)/;
@@ -83,10 +83,14 @@ GM_xmlhttpRequest({
       let marksEle = document.createElement("td");
       for (let [mark, content] of marks) {
         tr.classList.add(`pkgmark-${mark}`);
-        let ele = document.createElement("div");
-        ele.classList.add(`pkgmark`, `pkgmark-${mark}`);
-        ele.innerText = `${mark}: ${content}`;
-        marksEle.append(ele);
+        let details = document.createElement("details");
+        let summary = document.createElement("summary");
+        summary.innerText = mark;
+        content = content.split(/\.\.\.(.*)/s).join("").trim();
+        details.classList.add(`pkgmark`, `pkgmark-${mark}`);
+        details.append(summary);
+        details.append(content);
+        marksEle.append(details);
       }
       tr.append(marksEle);
     }
