@@ -1,15 +1,36 @@
 // ==UserScript==
 // @name         Aggregated status page
 // @namespace    http://kxxt.dev
-// @version      0.1
+// @version      0.2
 // @description  Aggregated status page
-// @author       You
+// @author       kxxt
 // @match        https://archriscv.felixc.at/.status/status.htm
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=tampermonkey.net
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 "use strict";
+
+let style = document.createElement("style");
+
+style.innerHTML = `
+tr.pkgmark-upstreamed{background-color:lightblue;}
+tr.pkgmark-ready,tr.pkgmark-pending,tr.pkgmark-noqemu{background-color:lightgreen;}
+tr.pkgmark-failing{}
+tr.pkgmark-outdated,tr.pkgmark-outdated_dep,tr.pkgmark-missing_dep,tr.pkgmark-ignore,tr.pkgmark-stuck{background-color:lightgray;}
+tr.pkgmark-unknown{background-color:khaki;}
+tr.pkgmark-nocheck{background-color:lightgoldenrodyellow;}
+tr.pkgmark-flaky{background-color:lightsteelblue;}
+div.pkgmark-noqemu{background-color:hotpink;}
+div.pkgmark-upstreamed{background-color:lightseagreen;}
+div.pkgmark-unknown{background-color:gold;}
+div.pkgmark-outdated_dep, div.pkgmark-outdated{background-color: yellow;}
+div.pkgmark-stuck{background-color: lightsalmon;}
+div.pkgmark-ready{background-color: aqua;}
+div.pkgmark-ignore{background-color: azure;}
+`;
+
+document.head.append(style);
 
 GM_xmlhttpRequest({
   method: "GET",
@@ -61,7 +82,9 @@ GM_xmlhttpRequest({
       tr.append(status.cloneNode(true));
       let marksEle = document.createElement("td");
       for (let [mark, content] of marks) {
+        tr.classList.add(`pkgmark-${mark}`);
         let ele = document.createElement("div");
+        ele.classList.add(`pkgmark`, `pkgmark-${mark}`);
         ele.innerText = `${mark}: ${content}`;
         marksEle.append(ele);
       }
