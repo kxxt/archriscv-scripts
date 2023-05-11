@@ -16,8 +16,10 @@
 if (location.pathname.startsWith("/.status/logs/")) {
   let h1 = document.querySelector("h1");
   h1.insertAdjacentHTML("afterend", "<h2>Sorting by version...</h2>");
-  // Hacky way to wait until the wasm module is loaded
-  window.setTimeout(() => {
+  var Module = typeof Module != "undefined" ? Module : {};
+  let executed = false;
+  const fun = () => {
+    executed = true;
     let vercmp = (a, b) => {
       return Module.ccall(
         "alpm_pkg_vercmp",
@@ -45,7 +47,13 @@ if (location.pathname.startsWith("/.status/logs/")) {
     document.querySelector("pre").innerHTML = sorted;
     document.querySelector("h2").remove();
     h1.insertAdjacentHTML("afterend", "<h2>Sorted by version</h2>");
-  }, 2000);
+  };
+  Module["onRuntimeInitialized"] = fun;
+  setTimeout(() => {
+    if (!executed) {
+      fun();
+    }
+  }, 8000);
 } else {
   let style = document.createElement("style");
 
