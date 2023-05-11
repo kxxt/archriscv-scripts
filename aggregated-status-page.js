@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Aggregated status page
 // @namespace    http://kxxt.dev
-// @version      0.4
+// @version      0.5
 // @description  Aggregated status page
 // @author       kxxt
 // @match        https://archriscv.felixc.at/.status/status.htm
@@ -14,22 +14,38 @@
 
 "use strict";
 if (location.pathname.startsWith("/.status/logs/")) {
-  let vercmp = (a, b) => {
-    return Module.ccall(
-      "alpm_pkg_vercmp",
-      "number",
-      ["string", "string"],
-      [a, b]
-    );
-  };
-  let parentDir = document.querySelector("pre > a[href='../']");
-  let logs = Array.from(document.querySelector("pre > a:not(:first-child)"));
-  logs.sort((a, b) => {
-    let aVer = a.innerText.match(/(.*)\.log/)[1];
-    let bVer = b.innerText.match(/(.*)\.log/)[1];
-    return vercmp(aVer, bVer);
-  });
-  console.log(logs);
+  let h1 = document.querySelector("h1");
+  h1.insertAdjacentHTML("afterend", "<h2>Sorting by version...</h2>");
+  // Hacky way to wait until the wasm module is loaded
+  window.setTimeout(() => {
+    let vercmp = (a, b) => {
+      return Module.ccall(
+        "alpm_pkg_vercmp",
+        "number",
+        ["string", "string"],
+        [a, b]
+      );
+    };
+    let lines = document.querySelector("pre").innerHTML.split("\n");
+    let parentDirLine = lines[0];
+    lines = lines.slice(1);
+    lines.pop();
+    let packageName = h1.innerText.split("/").splice(-2, 1)[0];
+    let getver = (text, package) => {
+      let fn = text.match(/>(.*?)</)?.[1];
+      let pat = new RegExp(`^${package}-(.*?)(-(riscv64|x86_64)-.*)?\\.log$`);
+      return fn?.match(pat)?.[1] ?? "0";
+    };
+    lines.sort((a, b) => {
+      let aVer = getver(a, packageName);
+      let bVer = getver(b, packageName);
+      return vercmp(aVer, bVer);
+    });
+    let sorted = parentDirLine + "\n" + lines.join("\n");
+    document.querySelector("pre").innerHTML = sorted;
+    document.querySelector("h2").remove();
+    h1.insertAdjacentHTML("afterend", "<h2>Sorted by version</h2>");
+  }, 2000);
 } else {
   let style = document.createElement("style");
 
