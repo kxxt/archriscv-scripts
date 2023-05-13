@@ -112,13 +112,8 @@ details { white-space: pre-wrap; }
         let pkg = tr.children[1].innerText;
         let pat = /.+ \((.+)\)/;
         let pkgname = pkg.match(pat)?.[1] ?? pkg;
-        if (!map.has(pkgname)) {
-          tr.innerHTML += "<td/><td/><td/>";
-          continue;
-        }
-        let { archUrl, marks, user, status } = map.get(pkgname);
         let a = document.createElement("a");
-        a.href = archUrl;
+        a.href = `https://archlinux.org/packages/?q=${pkgname}`;
         a.innerText = tr.children[0].innerText;
         tr.children[0].innerHTML = "";
         tr.children[0].append(a);
@@ -127,6 +122,11 @@ details { white-space: pre-wrap; }
         a.innerText = pkg;
         tr.children[1].innerHTML = "";
         tr.children[1].append(a);
+        if (!map.has(pkgname)) {
+          tr.innerHTML += "<td/><td/><td/>";
+          continue;
+        }
+        let { marks, user, status } = map.get(pkgname);
         tr.append(user.cloneNode(true));
         tr.append(status.cloneNode(true));
         let marksEle = document.createElement("td");
