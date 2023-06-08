@@ -93,8 +93,8 @@ details.pkgmark { white-space: pre-wrap; }
           marks.set(x.classList[1].split("-")[1], x.title)
         );
         let pkgname =
-          tr.querySelector("td > a:nth-child(2)")?.innerText ??
-          tr.children[0].childNodes[1].data.slice(2).trim();
+          tr.children[0].childNodes[1].data?.slice(2)?.trim() ??
+          tr.children[0].childNodes[2].innerText;
         let user = tr.children[1];
         let status = tr.children[2];
         map.set(pkgname, { archUrl, marks, user, status });
