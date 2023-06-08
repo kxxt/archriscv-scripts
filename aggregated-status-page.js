@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Aggregated status page
 // @namespace    http://kxxt.dev
-// @version      0.6
+// @version      0.7
 // @description  Aggregated status page
 // @author       kxxt
 // @match        https://archriscv.felixc.at/.status/status.htm
@@ -73,7 +73,7 @@ details.pkgmark-stuck{background-color: lightsalmon;}
 details.pkgmark-ready{background-color: aqua;}
 details.pkgmark-ignore{background-color: azure;}
 details.pkgmark-nocheck{background-color: lightcoral;}
-details { white-space: pre-wrap; }
+details.pkgmark { white-space: pre-wrap; }
 `;
 
   document.head.append(style);
