@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Aggregated status page
 // @namespace    http://kxxt.dev
-// @version      0.7
+// @version      0.8
 // @description  Aggregated status page
 // @author       kxxt
 // @match        https://archriscv.felixc.at/.status/status.htm
